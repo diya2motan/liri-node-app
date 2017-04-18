@@ -3,25 +3,15 @@ const request = require("request");
 const twitter = require("twitter");
 const spotify = require("spotify");
 const inquirer = require("inquirer");
+const fs = require("fs");
 
 
 var command = process.argv[2];
 
-inquirer.prompt([
-  {
-    type: "list",
-    name: "command",
-    message: "Please choose a command: ",
-    choices: ["my-tweets", "spotify-this-song", "movie-this", "do-what-it-says"]
-  }
-
-]).then(function(user) {
-
-});
 
 // console.log(twitterKeys.consumer_key);
 
-
+console.log(command);
 
 if (command == 'my-tweets') {
     var client = new twitter({
@@ -129,10 +119,10 @@ if (command == 'my-tweets') {
         movieName = "Mr. Nobody";
     }
     // Then run a request to the OMDB API with the movie specified
-    var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&r=json";
+    var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&r=json&tomatoes=true";
 
     // This line is just to help us debug against the actual URL.
-    // console.log(queryUrl);
+    console.log(queryUrl);
 
     request(queryUrl, function(error, response, body) {
         // If the request is successful (i.e. if the response status code is 200)
@@ -144,13 +134,17 @@ if (command == 'my-tweets') {
             console.log("Language: " + JSON.parse(body).Language);
             console.log("Plot: " + JSON.parse(body).Plot);
             console.log("Actors: " + JSON.parse(body).Actors);
+            console.log("Rotten Tomatoes Rating: " + JSON.parse(body).tomatoRating);
+            console.log("Rotten Tomatoes URL: " + JSON.parse(body).tomatoURL);
+            
             // console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Country);
             // console.log("Rotten Tomatoes URL: " + JSON.parse(body).Country);
         }
     });
 
 } else if (command == 'do-what-it-says') {
-    var fs = require("fs");
+
+    
     fs.readFile("random.txt", "utf8", function(error, data) {
 
         // We will then print the contents of data
@@ -169,7 +163,4 @@ if (command == 'my-tweets') {
 }
 
 //The log file
-fs.appendFile("log.txt",command + ", ", (err, value) => {
-    
-    
-  });
+fs.appendFile("log.txt",command + ", ");
