@@ -4,6 +4,7 @@ const twitter = require("twitter");
 const spotify = require("spotify");
 const inquirer = require("inquirer");
 const fs = require("fs");
+const liri = require("./liri.js");
 
 
 var command = process.argv[2];
@@ -14,7 +15,57 @@ var command = process.argv[2];
 console.log(command);
 
 if (command == 'my-tweets') {
-    var client = new twitter({
+
+    myTweets();
+
+} else if (command == 'spotify-this-song') {
+    var userInput = process.argv;
+    var song = "";
+    for (var i = 3; i < userInput.length; i++) {
+        song += (userInput[i] + " ");
+    }
+    // song.join(" ");
+    song.trim();
+	spotifyThisSong(song);
+
+} else if (command == 'movie-this') {
+    // Store all of the arguments in an array
+    var nodeArgs = process.argv;
+
+    // Create an empty variable for holding the movie name
+    var movieName = "";
+
+    // Loop through all the words in the node argument
+    // And do a little for-loop magic to handle the inclusion of "+"s
+    for (var i = 3; i < nodeArgs.length; i++) {
+
+        if (i > 3 && i < nodeArgs.length) {
+
+            movieName = movieName + "+" + nodeArgs[i];
+
+        } else {
+
+            movieName += nodeArgs[i];
+
+        }
+    }
+
+	movieIt(movieName);
+
+} else if (command == 'do-what-it-says') {
+
+    doWhatItSays();
+
+} else {
+    console.log("Please, enter a valid command!!");
+}
+
+//The log file
+fs.appendFile("log.txt",command + ", ");
+
+
+function myTweets(){
+	var client = new twitter({
         consumer_key: keys.twitterKeys.consumer_key,
         consumer_secret: keys.twitterKeys.consumer_secret,
         access_token_key: keys.twitterKeys.access_token_key,
@@ -33,14 +84,10 @@ if (command == 'my-tweets') {
             console.log(err);
         }
     });
-} else if (command == 'spotify-this-song') {
-    var userInput = process.argv;
-    var song = "";
-    for (var i = 3; i < userInput.length; i++) {
-        song += (userInput[i] + " ");
-    }
-    // song.join(" ");
-    song.trim();
+}
+
+function spotifyThisSong(song){
+	
     // console.log(song);
     // console.log(song);
     //song not entered
@@ -91,31 +138,10 @@ if (command == 'my-tweets') {
             }
         });
     }
+}
 
-
-
-} else if (command == 'movie-this') {
-    // Store all of the arguments in an array
-    var nodeArgs = process.argv;
-
-    // Create an empty variable for holding the movie name
-    var movieName = "";
-
-    // Loop through all the words in the node argument
-    // And do a little for-loop magic to handle the inclusion of "+"s
-    for (var i = 3; i < nodeArgs.length; i++) {
-
-        if (i > 3 && i < nodeArgs.length) {
-
-            movieName = movieName + "+" + nodeArgs[i];
-
-        } else {
-
-            movieName += nodeArgs[i];
-
-        }
-    }
-    if (movieName == "") {
+function movieIt(movieName){
+	if (movieName == "") {
         movieName = "Mr. Nobody";
     }
     // Then run a request to the OMDB API with the movie specified
@@ -141,10 +167,10 @@ if (command == 'my-tweets') {
             // console.log("Rotten Tomatoes URL: " + JSON.parse(body).Country);
         }
     });
+}
 
-} else if (command == 'do-what-it-says') {
+function doWhatItSays(){
 
-    
     fs.readFile("random.txt", "utf8", function(error, data) {
 
         // We will then print the contents of data
@@ -156,11 +182,17 @@ if (command == 'my-tweets') {
         // We will then re-display the content as an array for later use.
         console.log(dataArr);
 
+        if(dataArr[0] == "my-tweets"){
+        	myTweets();
+        }
+        else if(dataArr[0] == "spotify-this-song"){
+        	spotifyThisSong(dataArr[1]);
+        }
+        else if(dataArr[0] == "movie-this"){
+        	movieIt(dataArr[1]);
+        }
+
+
+
     });
-
-} else {
-    console.log("Please, enter a valid command!!");
 }
-
-//The log file
-fs.appendFile("log.txt",command + ", ");
